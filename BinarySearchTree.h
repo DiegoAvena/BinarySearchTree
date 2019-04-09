@@ -122,6 +122,38 @@ public:
 
   }
 
+  K sumUpKeys(TreeNode<K, V>* node) {
+
+    K sum = 0;
+
+    if (node != NULL) {
+
+      sum += sumUpKeys(node->left);
+      sum += node->getKey();
+      sum += sumUpKeys(node->right);
+
+    }
+
+    return sum;
+
+  }
+
+  K sumUpValues(TreeNode<K, V>* node) {
+
+    K sum = 0;
+
+    if (node != NULL) {
+
+      sum += sumUpKeys(node->left);
+      sum += node->getValue();
+      sum += sumUpKeys(node->right);
+
+    }
+
+    return sum;
+
+  }
+
   unsigned int height(K keyOfNodeToGetHeightOf) throw(NodeNotFoundInTreeException){
 
     TreeNode<K, V>* nodeToGetHeightOf = root;
