@@ -306,12 +306,12 @@ public:
 
   }
 
-  void erase(K keyOfNodeToDelete) throw(NodeNotFoundInTreeException){
+  void erase(K keyOfNodeToDelete) throw(NodeNotFoundInTreeException, TreeEmptyException){
 
     if (empty()) {
 
       //throw a tree is empty exception:
-      throw NodeNotFoundInTreeException("Exception: cannot erase a node that does not exist in the tree.");
+      throw TreeEmptyException("Exception: cannot delete nodes from an empty tree");
 
     }
     else {
@@ -352,8 +352,7 @@ public:
       if (nodeToDelete == NULL) {
 
         //the node to be deleted was not found in the tree:
-        //throw a node not found in tree exception
-        return;
+        throw NodeNotFoundInTreeException("Exception: cannot erase a node that does not exist in the tree.");
 
       }
       else {
@@ -419,14 +418,14 @@ public:
           }
           else if (nodeToDeleteIsALeftChild) {
 
-            //the nodeToDelete is a left child of the parentOfNodeToDelete, set the left child of parentOfNodeToDelete to point to the left child of the nodeToDelete:
-            parentOfNodeToDelete->left = nodeToDelete->left;
+            //the nodeToDelete is a left child of the parentOfNodeToDelete, set the left child of parentOfNodeToDelete to point to the right child of the nodeToDelete:
+            parentOfNodeToDelete->left = nodeToDelete->right;
 
           }
           else {
 
-            //the nodeToDelete is a right child of the parentOfNodeToDelete, set the right child of parentOfNodeToDelete to point to the left child of the nodeToDelete:
-            parentOfNodeToDelete->right = nodeToDelete->left;
+            //the nodeToDelete is a right child of the parentOfNodeToDelete, set the right child of parentOfNodeToDelete to point to the right child of the nodeToDelete:
+            parentOfNodeToDelete->right = nodeToDelete->right;
 
           }
 
