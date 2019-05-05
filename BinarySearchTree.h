@@ -9,12 +9,20 @@
 
 template <typename K, typename V>
 
+/*
+
+-A data structure that stores nodes with both a key and value. Each node has a left and right child, which can be null (called leaves).
+These nodes are sorted by their keys: nodes with keys greater than the keys of other nodes in the tree are stored on the left
+and nodes with keys greater than other nodes are stored on the right. This tree does not balance itself.
+
+*/
 class BinarySearchTree {
 
-private:
-  TreeNode<K, V>* root;
-  unsigned int size;
+protected:
+  TreeNode<K, V>* root; //the root node of this tree
+  unsigned int size; //the amount of nodes in this tree
 
+  //traverses the tree and deletes every node, used by the destructor
   TreeNode<K, V>* deleteAll(TreeNode<K, V>* nodeToRemove) {
 
     if (nodeToRemove->left != NULL) {
@@ -34,9 +42,8 @@ private:
 
   }
 
+  //gets the inorder successor, which is really the leftmost node in the right subtree rooted at the right child of a node that is being deleted
   TreeNode<K, V>* getSuccessor(TreeNode<K, V>* nodeToDelete) {
-
-    //gets the inorder successor, which is really the leftmost node in the right subtree rooted at the right child of the nodeToDelete
 
     TreeNode<K, V>* successorParent = nodeToDelete;
     TreeNode<K, V>* successor = nodeToDelete;
@@ -75,41 +82,47 @@ private:
 
 public:
 
+  //default constructor
   BinarySearchTree() {
 
     root = NULL;
 
   }
 
+  //overloaded constructor, sets the root key and value to the same thing
   BinarySearchTree(K rootKey) {
 
     root = new TreeNode<K, V>(rootKey, rootKey);
 
   }
 
+  //overloaded constructor, sets the root key and value to seperate dataTypes
   BinarySearchTree(K rootKey, V rootValue) {
 
     root = new TreeNode<K, V>(rootKey, rootValue);
 
   }
 
+  //destructor
   virtual ~BinarySearchTree() {
 
+    //delete every node in the tree
     if (empty() == false) {
 
       deleteAll(root);
-      std::cout<<empty()<<std::endl;
 
     }
 
   }
 
-  TreeNode<K, V>* getRoot() {
+  //returns a reference to the root node
+  TreeNode<K, V>* getRoot() const {
 
     return root;
 
   }
 
+  //prints every node in the tree sorted by increasing key value
   void inOrderPrint(TreeNode<K, V>* node) {
 
     if (node != NULL) {
@@ -122,6 +135,7 @@ public:
 
   }
 
+  //sums up the keys in the tree and returns that value, only for use with numerical keys
   K sumUpKeys(TreeNode<K, V>* node) {
 
     K sum = 0;
@@ -138,6 +152,7 @@ public:
 
   }
 
+  //sums up the values in the tree, only for use with numerical values
   K sumUpValues(TreeNode<K, V>* node) {
 
     K sum = 0;
@@ -154,10 +169,12 @@ public:
 
   }
 
+  //gets the height of the given node, which is the max depth of that node: https://www.geeksforgeeks.org/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/
   unsigned int height(K keyOfNodeToGetHeightOf) throw(NodeNotFoundInTreeException){
 
     TreeNode<K, V>* nodeToGetHeightOf = root;
 
+    //find the node to get the height of
     while (nodeToGetHeightOf != NULL) {
 
       if (keyOfNodeToGetHeightOf < nodeToGetHeightOf->getKey()) {
@@ -211,8 +228,6 @@ public:
         rightHeight = 1 + height(nodeToGetHeightOf->right->getKey());
 
       }
-      //unsigned int leftHeight = 1 + height(nodeToGetHeightOf->left->getKey());
-      //unsigned int rightHeight = 1 + height(nodeToGetHeightOf->right->getKey());
 
       if (leftHeight > rightHeight) {
 
@@ -226,11 +241,12 @@ public:
 
   }
 
+  //gets the depth of a node in the tree, which is the number of ancestors a node has
   unsigned int depth(K keyOfNodeToGetDepthOf) throw(NodeNotFoundInTreeException){
 
     unsigned int depth = 0;
 
-    if (find(keyOfNodeToGetDepthOf)) {
+    if (find(keyOfNodeToGetDepthOf) != NULL) {
 
       //the node to get the depth of is in the tree:
       TreeNode<K, V>* node = root;
@@ -265,11 +281,12 @@ public:
 
   }
 
-  bool find(K keyOfNodeToFind) {
+  //finds a node in the tree
+  TreeNode<K, V>* find(K keyOfNodeToFind) {
 
     if (empty()) {
 
-      return false;
+      return NULL;
 
     }
     else {
@@ -293,19 +310,20 @@ public:
         else {
 
           //the node must have been found, return true:
-          return true;
+          return node;
 
         }
 
       }
 
       //the node was not found since the loop above went all the way to a leaf:
-      return false;
+      return NULL;
 
     }
 
   }
 
+  //erases a node from the tree
   void erase(K keyOfNodeToDelete) throw(NodeNotFoundInTreeException, TreeEmptyException){
 
     if (empty()) {
@@ -386,7 +404,7 @@ public:
           //case 2: the node to be deleted has a left child:
           if (nodeToDelete == root) {
 
-            root = nodeToDelete->right;
+            root = nodeToDelete->left;
 
           }
           else if (nodeToDeleteIsALeftChild) {
@@ -451,7 +469,7 @@ public:
 
           }
 
-          successor->left = nodeToDelete->left;
+          successor->left = nodeToDelete->left; //the left node of the sucessor is always null, so it is safe to do this, and necessary to preserve the left child of the node being deleted
           delete nodeToDelete;
 
         }
@@ -462,9 +480,10 @@ public:
 
   }
 
+  //inserts a node into the tree
   void insert(K key, V value) throw(NodeAlreadyExistsInTreeException){
 
-    if (find(key)) {
+    if (find(key) != NULL) {
 
       //throw a node already exists in tree exception:
       throw NodeAlreadyExistsInTreeException("Exception: cannot put a node that already exists into tree");
@@ -525,6 +544,7 @@ public:
 
   }
 
+  //gets the node with the smallest key in the tree, which is really just the leftmost node in the tree
   const TreeNode<K, V>* min() throw(TreeEmptyException){
 
     if (empty()) {
@@ -551,6 +571,7 @@ public:
 
   }
 
+  //gets the node with the max key in the tree, which is really just the rightmost node in the tree
   const TreeNode<K, V>* max() throw(TreeEmptyException){
 
     if (empty()) {
@@ -577,12 +598,14 @@ public:
 
   }
 
+  //returns the number of nodes currently in the tree
   const unsigned int& getSize() {
 
     return size;
 
   }
 
+  //checks if the tree is empty
   bool empty() {
 
     return (root == NULL);
